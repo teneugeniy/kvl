@@ -1,4 +1,4 @@
-package kg.ten.validuck
+package kg.ten.kvl
 
 import org.apache.commons.text.StringSubstitutor
 import kotlin.reflect.KProperty

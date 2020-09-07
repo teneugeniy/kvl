@@ -1,4 +1,4 @@
-package kg.ten.validuck
+package kg.ten.kvl
 
 data class ValidationError(
     val path: String,

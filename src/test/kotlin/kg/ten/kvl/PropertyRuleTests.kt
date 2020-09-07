@@ -1,4 +1,4 @@
-package kg.ten.validuck
+package kg.ten.kvl
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.collection.IsEmptyCollection.empty
