@@ -1,21 +1,21 @@
-package kg.ten.kvl
+package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.collection.IsEmptyCollection.empty
-import org.hamcrest.core.Is.`is`
-import org.hamcrest.core.IsNot.not
+import org.hamcrest.MatcherAssert
+import org.hamcrest.collection.IsEmptyCollection
+import org.hamcrest.core.Is
+import org.hamcrest.core.IsNot
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class PropertyRuleTests {
+class RulesForTests {
 
     class Person(
         val name: String
     )
 
-    class PersonValidator : Validator<Person>() {
+    class PersonValidator : KvlValidator<Person>() {
         init {
-            ruleFor(Person::name) {
+            rulesFor(Person::name) {
                 must { it.length > 2 }.withMessage("min" to 2) { "Must be at least %(min) symbols. Current value: $it" }
             }
         }
@@ -30,49 +30,49 @@ class PropertyRuleTests {
 
     @Test
     fun `validate SHOULD not generate errors WHEN conditions are met`() {
-        //arrange
+        // arrange
         val person = Person("Jack Black")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(errors, empty())
+        // assert
+        MatcherAssert.assertThat(errors, IsEmptyCollection.empty())
     }
 
     @Test
     fun `validate SHOULD generate errors WHEN conditions are not met`() {
-        //arrange
+        // arrange
         val person = Person("")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(errors, `is`(not(empty())))
+        // assert
+        MatcherAssert.assertThat(errors, Is.`is`(IsNot.not(IsEmptyCollection.empty())))
     }
 
     @Test
     fun `validate SHOULD generate message`() {
-        //arrange
+        // arrange
         val person = Person("1")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(errors.first().message, `is`("Must be at least 2 symbols. Current value: 1"))
+        // assert
+        MatcherAssert.assertThat(errors.first().message, Is.`is`("Must be at least 2 symbols. Current value: 1"))
     }
 
     @Test
     fun `validate SHOULD generate path`() {
-        //arrange
+        // arrange
         val person = Person("1")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(errors.first().path, `is`("name"))
+        // assert
+        MatcherAssert.assertThat(errors.first().pathValue, Is.`is`("name"))
     }
 }

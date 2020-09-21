@@ -1,7 +1,7 @@
-package kg.ten.kvl
+package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -11,9 +11,9 @@ class MultipleRulesTests {
         val name: String
     )
 
-    class PersonValidator : Validator<Person>() {
+    class PersonValidator : KvlValidator<Person>() {
         init {
-            ruleFor(Person::name) {
+            rulesFor(Person::name) {
                 must { it.contains("Jack").not() }.withMessage { "message one" }
                 must { it.contains("Sir") }.withMessage { "message two" }
             }
@@ -29,15 +29,16 @@ class MultipleRulesTests {
 
     @Test
     fun `validate SHOULD generate errors for all failed rules`() {
-        //arrange
+        // arrange
         val person = Person("Jack Black")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(
-            errors, containsInAnyOrder(
+        // assert
+        MatcherAssert.assertThat(
+            errors,
+            Matchers.containsInAnyOrder(
                 ValidationError(path = "name", message = "message one"),
                 ValidationError(path = "name", message = "message two")
             )

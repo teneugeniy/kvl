@@ -1,7 +1,7 @@
-package kg.ten.kvl
+package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -11,9 +11,9 @@ class CascadeRulesTests {
         val name: String
     )
 
-    class PersonValidator : Validator<Person>() {
+    class PersonValidator : KvlValidator<Person>() {
         init {
-            ruleFor(Person::name) {
+            rulesFor(Person::name) {
                 must { it.contains("Jack") }.withMessage { "should contain Jack" }
                     .and()
                     .must { it.contains("Black") }.withMessage { "should contain Black" }
@@ -30,15 +30,16 @@ class CascadeRulesTests {
 
     @Test
     fun `validate SHOULD return only the first error WHEN the first check fails`() {
-        //arrange
+        // arrange
         val person = Person("Black")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(
-            errors, containsInAnyOrder(
+        // assert
+        MatcherAssert.assertThat(
+            errors,
+            Matchers.containsInAnyOrder(
                 ValidationError(path = "name", message = "should contain Jack")
             )
         )
@@ -46,15 +47,16 @@ class CascadeRulesTests {
 
     @Test
     fun `validate SHOULD return only the last error WHEN the last check fails`() {
-        //arrange
+        // arrange
         val person = Person("Jack White")
 
-        //act
+        // act
         val errors = personValidator.validate(person)
 
-        //assert
-        assertThat(
-            errors, containsInAnyOrder(
+        // assert
+        MatcherAssert.assertThat(
+            errors,
+            Matchers.containsInAnyOrder(
                 ValidationError(path = "name", message = "should contain Black")
             )
         )
