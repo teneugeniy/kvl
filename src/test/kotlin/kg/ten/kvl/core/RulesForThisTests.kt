@@ -1,7 +1,11 @@
 package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import kg.ten.kvl.core.fluent.must
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import kg.ten.kvl.core.fluent.withMessage
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -12,7 +16,7 @@ class RulesForThisTests {
         val weightOfBeverages: Int
     )
 
-    private class OrderValidator : KvlValidator<Order>() {
+    private class OrderValidator : NoContextKvlValidator<Order>() {
         init {
             rulesForThis {
                 must { it.weightOfMeal + it.weightOfBeverages < 10 }.withMessage { "Total weight of the order should not exceed 10 kilos" }
@@ -36,7 +40,7 @@ class RulesForThisTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(errors, Matchers.empty())
+        assertThat(errors, empty())
     }
 
     @Test
@@ -48,9 +52,9 @@ class RulesForThisTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "", message = "Total weight of the order should not exceed 10 kilos")
             )
         )

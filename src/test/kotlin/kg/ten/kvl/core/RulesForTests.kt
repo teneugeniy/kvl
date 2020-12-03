@@ -1,9 +1,12 @@
 package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert
-import org.hamcrest.collection.IsEmptyCollection
-import org.hamcrest.core.Is
-import org.hamcrest.core.IsNot
+import kg.ten.kvl.core.fluent.must
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import kg.ten.kvl.core.fluent.withMessage
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.empty
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -13,7 +16,7 @@ class RulesForTests {
         val name: String
     )
 
-    class PersonValidator : KvlValidator<Person>() {
+    class PersonValidator : NoContextKvlValidator<Person>() {
         init {
             rulesFor(Person::name) {
                 must { it.length > 2 }.withMessage("min" to 2) { "Must be at least %(min) symbols. Current value: $it" }
@@ -37,7 +40,7 @@ class RulesForTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(errors, IsEmptyCollection.empty())
+        assertThat(errors, empty())
     }
 
     @Test
@@ -49,7 +52,7 @@ class RulesForTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(errors, Is.`is`(IsNot.not(IsEmptyCollection.empty())))
+        assertThat(errors, `is`(not(empty())))
     }
 
     @Test
@@ -61,7 +64,7 @@ class RulesForTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(errors.first().message, Is.`is`("Must be at least 2 symbols. Current value: 1"))
+        assertThat(errors.first().message, `is`("Must be at least 2 symbols. Current value: 1"))
     }
 
     @Test
@@ -73,6 +76,6 @@ class RulesForTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(errors.first().pathValue, Is.`is`("name"))
+        assertThat(errors.first().pathValue, `is`("name"))
     }
 }

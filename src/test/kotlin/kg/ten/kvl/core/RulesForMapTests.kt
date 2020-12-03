@@ -1,7 +1,11 @@
 package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import kg.ten.kvl.core.fluent.must
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import kg.ten.kvl.core.fluent.withMessage
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -27,7 +31,7 @@ class RulesForMapTests {
         val warmedUp: Boolean
     )
 
-    class OrderValidator : KvlValidator<Order>() {
+    class OrderValidator : NoContextKvlValidator<Order>() {
         init {
             rulesForMap(Order::items) {
                 must { (itemCode, _) -> itemCode != "tobacco" }.withMessage { "Tobacco is not allowed" }
@@ -60,7 +64,7 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(errors, Matchers.empty())
+        assertThat(errors, empty())
     }
 
     @Test
@@ -72,9 +76,9 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "items.soap", message = "Express items should be in range")
             )
         )
@@ -89,9 +93,9 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "items.tobacco", message = "Tobacco is not allowed")
             )
         )
@@ -106,9 +110,9 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "items.water.quantity", message = "")
             )
         )
@@ -123,9 +127,9 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "items.water.quantity", message = "")
             )
         )
@@ -140,9 +144,9 @@ class RulesForMapTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "deliveries.SouthPole", message = "")
             )
         )

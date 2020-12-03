@@ -1,7 +1,10 @@
 package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import kg.ten.kvl.core.fluent.must
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -17,7 +20,7 @@ class NestedRuleTests {
         val address: String
     )
 
-    class PersonValidator : KvlValidator<Person>() {
+    class PersonValidator : NoContextKvlValidator<Person>() {
         init {
             rulesFor(Person::company) {
                 rulesFor(Company::address) {
@@ -49,9 +52,9 @@ class NestedRuleTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(ValidationError(path = "company.address", message = ""))
+            containsInAnyOrder(ValidationError(path = "company.address", message = ""))
         )
     }
 
@@ -64,9 +67,9 @@ class NestedRuleTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(ValidationError(path = "prevCompany.address", message = ""))
+            containsInAnyOrder(ValidationError(path = "prevCompany.address", message = ""))
         )
     }
 
@@ -79,6 +82,6 @@ class NestedRuleTests {
         val errors = personValidator.validate(person)
 
         // assert
-        MatcherAssert.assertThat(errors, Matchers.empty())
+        assertThat(errors, empty())
     }
 }

@@ -2,8 +2,11 @@ package kg.ten.kvl.core
 
 import io.mockk.every
 import io.mockk.mockk
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import kg.ten.kvl.core.fluent.nocontext.NoContextValidator
+import kg.ten.kvl.core.fluent.validator
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -18,18 +21,18 @@ class ApplyValidatorTests {
     )
 
     class EmployeeValidator(
-        private val companyValidator: Validator<Company>
-    ) : KvlValidator<Employee>() {
+        private val companyValidator: NoContextValidator<Company>
+    ) : NoContextKvlValidator<Employee>() {
         init {
             rulesFor(Employee::company) {
-                applyValidator(companyValidator)
+                validator(companyValidator)
             }
         }
     }
 
     private lateinit var employeeValidator: EmployeeValidator
 
-    private lateinit var companyValidator: Validator<Company>
+    private lateinit var companyValidator: NoContextValidator<Company>
 
     @BeforeEach
     fun setUp() {
@@ -43,15 +46,15 @@ class ApplyValidatorTests {
         val company = Company(name = "ABC")
         val employee = Employee(company = company)
 
-        every { companyValidator.validate(company) } returns listOf(ValidationError(path = "error.path", message = ""))
+        every { companyValidator.validate(company, Unit) } returns listOf(ValidationError(path = "error.path", message = ""))
 
         // act
         val errors = employeeValidator.validate(employee)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(ValidationError(path = "company.error.path", message = ""))
+            containsInAnyOrder(ValidationError(path = "company.error.path", message = ""))
         )
     }
 }

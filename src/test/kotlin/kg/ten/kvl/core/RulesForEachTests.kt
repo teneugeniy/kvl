@@ -1,7 +1,10 @@
 package kg.ten.kvl.core
 
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import kg.ten.kvl.core.fluent.must
+import kg.ten.kvl.core.fluent.nocontext.NoContextKvlValidator
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -11,7 +14,7 @@ class RulesForEachTests {
         val itemsWeights: List<Int>
     )
 
-    class OrderValidator : KvlValidator<Order>() {
+    class OrderValidator : NoContextKvlValidator<Order>() {
         init {
             rulesForEach(Order::itemsWeights) {
                 must { it < 10 }
@@ -35,7 +38,7 @@ class RulesForEachTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(errors, Matchers.empty())
+        assertThat(errors, empty())
     }
 
     @Test
@@ -47,9 +50,9 @@ class RulesForEachTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(ValidationError(path = "itemsWeights[0]", message = ""))
+            containsInAnyOrder(ValidationError(path = "itemsWeights[0]", message = ""))
         )
     }
 
@@ -62,9 +65,9 @@ class RulesForEachTests {
         val errors = orderValidator.validate(order)
 
         // assert
-        MatcherAssert.assertThat(
+        assertThat(
             errors,
-            Matchers.containsInAnyOrder(
+            containsInAnyOrder(
                 ValidationError(path = "itemsWeights[1]", message = ""),
                 ValidationError(path = "itemsWeights[3]", message = "")
             )
